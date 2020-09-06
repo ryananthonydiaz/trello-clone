@@ -3,7 +3,19 @@
     <div
       class="flex flex-col flex-grow items-start justify-between px-4"
     >
-      {{ taskName }}
+      <input
+        type="text"
+        class="p-2 w-full mr-2 flex-grow text-xl font-bold"
+        :value="task.name"
+        @change="updateTaskProperty($event, 'name')"
+        keyup.enter="updateTaskProperty($event, 'name')"
+      >
+
+      <textarea
+        class="relative w-full bg-transparent px-2 border mt-2 h-64 border-none leading-normal"
+        :value="task.description"
+        @change="updateTaskProperty($event, 'description')"
+      />
     </div>
   </div>
 </template>
@@ -22,6 +34,11 @@ export default {
         return this.task.name
       }
       return ''
+    }
+  },
+  methods: {
+    updateTaskProperty (e, key) {
+      this.$store.commit('UPDATE_TASK', { task: this.task, key, value: e.target.value })
     }
   }
 }
