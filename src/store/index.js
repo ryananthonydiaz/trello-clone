@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { CREATE_TASK, UPDATE_TASK, MOVE_TASK, MOVE_COLUMN } from './types'
+import { CREATE_TASK, UPDATE_TASK, MOVE_TASK, MOVE_COLUMN, CREATE_COLUMN } from './types'
 import defaultBoard from '../default-board'
 import { saveStatePlugin, uuid } from '../utils'
 
@@ -34,6 +34,12 @@ export default new Vuex.Store({
         name,
         id: uuid(),
         description: ''
+      })
+    },
+    [CREATE_COLUMN] (state, { name }) {
+      state.board.columns.push({
+        name,
+        tasks: []
       })
     },
     [UPDATE_TASK] (state, { task, key, value }) {
