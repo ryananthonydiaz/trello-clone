@@ -1,46 +1,61 @@
 <template>
-  <div
-    class="task"
-    @click="goToTask(task)"
-    draggable
-    @dragstart="pickupTask($event, taskIndex, columnIndex)"
-    dragover.prevent
-    dragenter.prevent
-    @drop.stop="moveTaskOrColumn($event, column.tasks, columnIndex, taskIndex)"
-  >
-    <span class="w-full flex-no-shrink font-bold">
-      {{ task.name }}
-    </span>
-    <p v-if="task.description" class="w-full flex-no-shrink mt-1 text-small">
-      {{ task.description }}
-    </p>
-  </div>
+  <AppDrop @drop="moveTaskOrColumn">
+    <AppDrag
+      class="task"
+      :transferData="{
+        type: 'task',
+        fromColumnIndex: columnIndex,
+        fromTaskIndex: taskIndex
+      }"
+      @click="goToTask(task)"
+    >
+      <span class="w-full flex-no-shrink font-bold">
+        {{ taskName }}
+      </span>
+      <p v-if="descriptionIsPresent" class="w-full flex-no-shrink mt-1 text-small">
+        {{ taskDescription }}
+      </p>
+    </AppDrag>
+  </AppDrop>
 </template>
 
 <script>
 import tasksAndColumns from '@/mixins/tasksAndColumns'
+import AppDrop from '@/components/AppDrop'
+import AppDrag from '@/components/AppDrag'
 
 export default {
+  components: { AppDrop, AppDrag },
   mixins: [tasksAndColumns],
   props: {
     task: {
-      type: Object,
-      required: true
+      type: [Object]
     },
     taskIndex: {
       type: Number,
       required: true
     }
   },
-  methods: {
-    pickupTask (e, taskIndex, fromColumnIndex) {
-      e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.dropEffect = 'move'
-
-      e.dataTransfer.setData('type', 'task')
-      e.dataTransfer.setData('from-task-index', taskIndex)
-      e.dataTransfer.setData('from-column-index', fromColumnIndex)
+  computed: {
+    taskName () {
+      if (this.task === null) {
+        return ''
+      } else {
+        return this.task.name
+      }
     },
+    taskDescription () {
+      if (this.task === null) {
+        return ''
+      } else {
+        return this.task.description
+      }
+    },
+    descriptionIsPresent () {
+      return this.taskDescription.length > 0
+    }
+  },
+  methods: {
     goToTask (task) {
       this.$router.push({ name: 'task', params: { id: task.id } })
     }
